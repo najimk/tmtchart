@@ -1,0 +1,257 @@
+<!-- Styles -->
+<style>
+  #chartdiv {
+    width: 100%;
+    height: 600px;
+  }
+</style>
+
+<!-- Resources -->
+<script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/charts.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/plugins/timeline.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/plugins/bullets.js"></script>
+<script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+
+<!-- Chart code -->
+<script>
+  am4core.ready(function () {
+    // Themes begin
+    am4core.useTheme(am4themes_animated);
+    // Themes end
+
+    var insterfaceColors = new am4core.InterfaceColorSet();
+    var lineColor = insterfaceColors.getFor("background");
+
+    var chart = am4core.create("chartdiv", am4plugins_timeline.CurveChart);
+    chart.curveContainer.padding(0, 20, 20, 20);
+
+    chart.data = [
+      // {
+      //   id: 6,
+      //   name: "Investment in south-tosouth exchange",
+      //   track: 6,
+      //   value: 95,
+      // },
+      {
+        id: 5,
+        name: "Pérenniser et renforcer une ligne budgétaire permanente pour l'achat des produits SR",
+        track: 5,
+        value: 60,
+      },
+      {
+        id: 4,
+        name: "Renforcer les services de SR/PF adaptés aux besoins des jeunes adolescents mariés",
+        track: 4,
+        value: 50,
+      },
+      {
+        id: 3,
+        name: "Créer un environnement favorable à la promotion de la planification familiale",
+        track: 3,
+        value: 40,
+      },
+      {
+        id: 2,
+        name: "Renforcer le circuit intégré de distribution de produit SRMNIA-N y compris les contraceptifs afin de les rendre disponibles jusqu'au dernier KM",
+        track: 2,
+        value: 50,
+      },
+      {
+        id: 1,
+        name: "Augmenter le Taux de Prévalence Contraceptive moderne",
+        track: 1,
+        value: 60,
+      },
+    ];
+
+    var categoryAxis = chart.yAxes.push(new am4charts.CategoryAxis());
+    categoryAxis.dataFields.category = "id";
+    categoryAxis.renderer.minGridDistance = 10;
+    categoryAxis.renderer.innerRadius = 5;
+    categoryAxis.renderer.radius = 145;
+    categoryAxis.renderer.line.stroke = lineColor;
+    categoryAxis.renderer.line.strokeWidth = 5;
+    categoryAxis.renderer.line.strokeOpacity = 1;
+
+    var labelTemplate = categoryAxis.renderer.labels.template;
+    labelTemplate.fill = lineColor;
+    labelTemplate.fontWeight = 600;
+    labelTemplate.fontSize = 11;
+
+    var gridTemplate = categoryAxis.renderer.grid.template;
+    gridTemplate.strokeWidth = 1;
+    gridTemplate.strokeOpacity = 1;
+    gridTemplate.stroke = lineColor;
+    gridTemplate.location = 0;
+    gridTemplate.above = true;
+
+    var fillTemplate = categoryAxis.renderer.axisFills.template;
+    fillTemplate.disabled = false;
+    fillTemplate.fill = am4core.color("#E3E3E3");
+    fillTemplate.fillOpacity = 1;
+
+    categoryAxis.fillRule = function (dataItem) {
+      dataItem.axisFill.__disabled = false;
+      dataItem.axisFill.opacity = 1;
+    };
+
+    var valueAxis = chart.xAxes.push(new am4charts.ValueAxis());
+    valueAxis.min = 0;
+    valueAxis.max = 100;
+    valueAxis.renderer.points = [
+      { x: 0, y: -100 },
+      { x: 200, y: -100 },
+      { x: 200, y: 100 },
+      { x: 0, y: 100 },
+      { x: -200, y: 100 },
+      { x: -200, y: -100 },
+      { x: 0, y: -100 },
+    ];
+
+    valueAxis.renderer.polyspline.tensionX = 0.4;
+    valueAxis.renderer.line.strokeOpacity = 0.1;
+    valueAxis.renderer.line.strokeWidth = 5;
+    valueAxis.renderer.maxLabelPosition = 0.98;
+    valueAxis.renderer.minLabelPosition = 0.02;
+
+    // Flag bullet
+    var flagRange = valueAxis.axisRanges.create();
+    flagRange.value = 0;
+    var flagBullet = new am4plugins_bullets.FlagBullet();
+    flagBullet.label.text = "NO ACTION";
+    flagRange.bullet = flagBullet;
+    //flagBullet.dy = -145;
+    flagBullet.adapter.add("dy", function (dy, target) {
+      return -categoryAxis.renderer.radius;
+    });
+
+    var flagRange2 = valueAxis.axisRanges.create();
+    flagRange2.value = 20;
+    var flagBullet2 = new am4plugins_bullets.FlagBullet();
+    flagBullet2.label.text = "IN PROGRESS";
+    flagRange2.bullet = flagBullet2;
+    flagBullet2.dy = -90;
+    flagBullet2.adapter.add("dy", function (dy, target) {
+      return categoryAxis.renderer.radius - 60;
+    });
+
+    var flagRange3 = valueAxis.axisRanges.create();
+    flagRange3.value = 71;
+    var flagBullet3 = new am4plugins_bullets.FlagBullet();
+    flagBullet3.label.text = "ON TRUCK";
+    flagRange3.bullet = flagBullet3;
+    flagBullet3.dy = -90;
+    flagBullet3.adapter.add("dy", function (dy, target) {
+      return -categoryAxis.renderer.radius + 100;
+    });
+
+    var valueLabelTemplate = valueAxis.renderer.labels.template;
+    valueLabelTemplate.fill = lineColor;
+    valueLabelTemplate.fontSize = 0;
+    valueLabelTemplate.fontWeight = 600;
+
+    valueLabelTemplate.fillOpacity = 1;
+    valueLabelTemplate.horizontalCenter = "right";
+    valueLabelTemplate.verticalCenter = "bottom";
+    valueLabelTemplate.padding(0, 10, 0, 0);
+    valueLabelTemplate.adapter.add("rotation", function (rotation, target) {
+      var value = target.dataItem.value;
+      var position = valueAxis.valueToPosition(value);
+
+      var angle = valueAxis.renderer.positionToAngle(position);
+      return angle;
+    });
+
+    var valueGridTemplate = valueAxis.renderer.grid.template;
+    valueGridTemplate.strokeOpacity = 0.3;
+    valueGridTemplate.stroke = lineColor;
+
+    // SERIES
+    var series = chart.series.push(new am4plugins_timeline.CurveColumnSeries());
+    series.dataFields.categoryY = "id";
+    series.stroke = lineColor;
+    series.fill = lineColor;
+    series.dataFields.valueX = "value";
+    series.defaultState.transitionDuration = 4000;
+
+    var columnTemplate = series.columns.template;
+    columnTemplate.fill = am4core.color("#262e41");
+    columnTemplate.strokeOpacity = 0;
+    columnTemplate.fillOpacity = 1;
+    columnTemplate.height = am4core.percent(100);
+
+    var hoverState = columnTemplate.states.create("hover");
+    hoverState.properties.fillOpacity = 0.8;
+
+    var bullet = series.bullets.push(new am4charts.CircleBullet());
+    bullet.fill = lineColor;
+
+    // LEGEND
+
+    var rect = markerTemplate.children.getIndex(0);
+    rect.cornerRadius(20, 20, 20, 20);
+
+    var as = markerTemplate.states.create("active");
+    as.properties.opacity = 0.5;
+
+    var image = markerTemplate.createChild(am4core.Image);
+    image.propertyFields.href = "file";
+    image.width = 30;
+    image.height = 30;
+    image.filters.push(new am4core.DesaturateFilter());
+
+    image.events.on("inited", function (event) {
+      var image = event.target;
+      var parent = image.parent;
+      image.mask = parent.children.getIndex(0);
+    });
+  }); // end am4core.ready()
+</script>
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The motion Tracker Chart</title>
+  </head>
+  <body>
+    <a href="index.html">Indonesia Demo</a> |
+    <a href="mauritania.html">Mauritania Demo</a>
+    <h3>Mauritania Demo</h3>
+    <div
+      style="
+        margin: 20px auto 30px;
+        border: 1px solid black;
+        padding: 10px;
+        width: 80%;
+      "
+    >
+      <ol>
+        <li>Augmenter le Taux de Prévalence Contraceptive moderne</li>
+        <li>
+          Renforcer le circuit intégré de distribution de produit SRMNIA-N y
+          compris les contraceptifs afin de les rendre disponibles jusqu'au
+          dernier KM
+        </li>
+        <li>
+          Créer un environnement favorable à la promotion de la planification
+          familiale
+        </li>
+        <li>
+          Renforcer les services de SR/PF adaptés aux besoins des jeunes
+          adolescents mariés
+        </li>
+        <li>
+          Pérenniser et renforcer une ligne budgétaire permanente pour l'achat
+          des produits SR
+        </li>
+      </ol>
+    </div>
+
+    <!-- HTML -->
+    <div id="chartdiv"></div>
+  </body>
+</html>
